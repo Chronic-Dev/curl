@@ -1,0 +1,176 @@
+TARGET=libcurl.a
+
+ifdef LIBTASN1_DIR
+  LIBTASN1DIR=$(LIBTASN1_DIR)
+else
+  LIBTASN1DIR=../libtasn1
+endif
+
+ifdef LIBGNUTLS_DIR
+  LIBGNUTLSDIR=$(LIBGNUTLS_DIR)
+else
+  LIBGNUTLSDIR=../gnutls
+endif
+
+ifdef LIBGCRYPT_DIR
+  LIBGCRYPTDIR=$(LIBGCRYPT_DIR)
+else
+  LIBGCRYPTDIR=../libgcrypt
+endif
+
+ifdef LIBGPGERR_DIR
+  LIBGPGERRDIR=$(LIBGPGERR_DIR)
+else
+  LIBGPGERRDIR=../libgpg-error
+endif
+
+ifdef AWK_PATH
+  AWK := $(AWK_PATH)
+else
+  AWK := $(shell which awk)
+endif
+
+UNAME := $(shell uname)
+
+ifeq ($(UNAME), Darwin)
+  ifeq ($(AWK),)
+    AWK := ../tools/osx/awk
+  endif
+  LN_S=ln -f -s
+endif
+
+ifeq ($(UNAME), Linux)
+  ifeq ($(AWK),)
+     $(error Please install awk for your distribution)
+  endif
+  LN_S=ln -f -s
+endif
+
+CFLAGS=-m32 -Iinclude -Iinclude/curl -Ilib -Isrc -I$(LIBTASN1DIR)/lib -I$(LIBGNUTLSDIR)/lib/includes -I$(LIBGCRYPTDIR)/src -I$(LIBGPGERRDIR)/src -Wall -O2 -Wno-system-headers -fPIC -DPIC -DHAVE_CONFIG_H -D_GCRYPT_IN_LIBGCRYPT
+
+ifeq ($(UNAME), Darwin)
+  check_arch = $(shell if as -arch $(1) -o /dev/null < /dev/null > /dev/null; then echo yes; else echo no; fi)
+  ifeq ($(call check_arch,i386), yes)
+    CFLAGS+=-arch i386
+  endif
+  ifeq ($(call check_arch,ppc), yes)
+    CFLAGS+=-arch ppc
+  endif
+endif
+
+ifeq ($(UNAME), Linux)
+  CFLAGS+=-DHAVE_MSG_NOSIGNAL=1 -DHAVE_STROPTS_H=1
+endif
+
+objects= \
+	lib/file.o \
+	lib/timeval.o \
+	lib/base64.o \
+	lib/hostip.o \
+	lib/progress.o \
+	lib/formdata.o \
+	lib/cookie.o \
+	lib/http.o \
+	lib/sendf.o \
+	lib/ftp.o \
+	lib/url.o \
+	lib/dict.o \
+	lib/if2ip.o \
+	lib/speedcheck.o \
+	lib/ldap.o \
+	lib/ssluse.o \
+	lib/version.o \
+	lib/getenv.o \
+	lib/escape.o \
+	lib/mprintf.o \
+	lib/telnet.o \
+	lib/netrc.o \
+	lib/getinfo.o \
+	lib/transfer.o \
+	lib/strequal.o \
+	lib/easy.o \
+	lib/security.o \
+	lib/krb4.o \
+	lib/curl_fnmatch.o \
+	lib/fileinfo.o \
+	lib/ftplistparser.o \
+	lib/wildcard.o \
+	lib/krb5.o \
+	lib/memdebug.o \
+	lib/http_chunks.o \
+	lib/strtok.o \
+	lib/connect.o \
+	lib/llist.o \
+	lib/hash.o \
+	lib/multi.o \
+	lib/content_encoding.o \
+	lib/share.o \
+	lib/http_digest.o \
+	lib/md4.o \
+	lib/md5.o \
+	lib/curl_rand.o \
+	lib/http_negotiate.o \
+	lib/inet_pton.o \
+	lib/strtoofft.o \
+	lib/strerror.o \
+	lib/hostasyn.o \
+	lib/hostip4.o \
+	lib/hostip6.o \
+	lib/hostsyn.o \
+	lib/inet_ntop.o \
+	lib/parsedate.o \
+	lib/select.o \
+	lib/gtls.o \
+	lib/sslgen.o \
+	lib/tftp.o \
+	lib/splay.o \
+	lib/strdup.o \
+	lib/socks.o \
+	lib/ssh.o \
+	lib/nss.o \
+	lib/qssl.o \
+	lib/rawstr.o \
+	lib/curl_addrinfo.o \
+	lib/socks_gssapi.o \
+	lib/socks_sspi.o \
+	lib/curl_sspi.o \
+	lib/slist.o \
+	lib/nonblock.o \
+	lib/curl_memrchr.o \
+	lib/imap.o \
+	lib/pop3.o \
+	lib/smtp.o \
+	lib/pingpong.o \
+	lib/rtsp.o \
+	lib/curl_threads.o \
+	lib/warnless.o \
+	lib/hmac.o \
+	lib/polarssl.o \
+	lib/curl_rtmp.o \
+	lib/openldap.o \
+	lib/curl_gethostname.o \
+	lib/gopher.o \
+	lib/axtls.o \
+	lib/idn_win32.o \
+	lib/http_negotiate_sspi.o \
+	lib/cyassl.o \
+	lib/http_proxy.o \
+	lib/non-ascii.o \
+	lib/asyn-ares.o \
+	lib/asyn-thread.o \
+	lib/curl_gssapi.o \
+	lib/curl_ntlm.o \
+	lib/curl_ntlm_wb.o \
+	lib/curl_ntlm_core.o \
+	lib/curl_ntlm_msgs.o \
+
+all: $(TARGET)
+
+%.o: %.c
+	$(CC) -o $@ $(CFLAGS) -c $<
+
+$(TARGET): $(objects)
+	$(AR) rcs $@ $(objects)
+
+clean:
+	rm -f lib/*.o $(TARGET)
