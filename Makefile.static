@@ -1,27 +1,9 @@
 TARGET=libcurl.a
 
-ifdef LIBTASN1_DIR
-  LIBTASN1DIR=$(LIBTASN1_DIR)
+ifdef OPENSSL_DIR
+  OPENSSLDIR=$(OPENSSL_DIR)
 else
-  LIBTASN1DIR=../libtasn1
-endif
-
-ifdef LIBGNUTLS_DIR
-  LIBGNUTLSDIR=$(LIBGNUTLS_DIR)
-else
-  LIBGNUTLSDIR=../gnutls
-endif
-
-ifdef LIBGCRYPT_DIR
-  LIBGCRYPTDIR=$(LIBGCRYPT_DIR)
-else
-  LIBGCRYPTDIR=../libgcrypt
-endif
-
-ifdef LIBGPGERR_DIR
-  LIBGPGERRDIR=$(LIBGPGERR_DIR)
-else
-  LIBGPGERRDIR=../libgpg-error
+  OPENSSLDIR=../openssl
 endif
 
 ifdef AWK_PATH
@@ -46,7 +28,7 @@ ifeq ($(UNAME), Linux)
   LN_S=ln -f -s
 endif
 
-CFLAGS=-m32 -Iinclude -Iinclude/curl -Ilib -Isrc -I$(LIBTASN1DIR)/lib -I$(LIBGNUTLSDIR)/lib/includes -I$(LIBGCRYPTDIR)/src -I$(LIBGPGERRDIR)/src -Wall -O2 -Wno-system-headers -DHAVE_CONFIG_H -D_GCRYPT_IN_LIBGCRYPT
+CFLAGS=-m32 -Iinclude -Iinclude/curl -Ilib -Isrc -I$(OPENSSLDIR)/include -Wall -O2 -Wno-system-headers -DHAVE_CONFIG_H
 
 LINUX_AND_DARWIN_DEFINES= \
 	-DCURL_PULL_SYS_SOCKET_H=1 \
