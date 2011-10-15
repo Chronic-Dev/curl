@@ -28,7 +28,7 @@ ifeq ($(UNAME), Linux)
   LN_S=ln -f -s
 endif
 
-CFLAGS=-m32 -Iinclude -Iinclude/curl -Ilib -Isrc -I$(OPENSSLDIR)/include -Wall -O2 -Wno-system-headers -DHAVE_CONFIG_H
+CFLAGS=-m32 -Iinclude -Iinclude/curl -Ilib -Isrc -I$(OPENSSLDIR)/include -Wall -O2 -Wno-system-headers -DHAVE_CONFIG_H -DCURL_STATICLIB=1
 
 LINUX_AND_DARWIN_DEFINES= \
 	-DCURL_PULL_SYS_SOCKET_H=1 \
@@ -94,6 +94,9 @@ endif
 ifdef WIN32
   CFLAGS+=-DWIN32 \
 	-DCURL_PULL_WS2TCPIP_H=1 \
+	-DHAVE_WS2TCPIP_H=1 \
+	-DNATIVE_WINDOWS=1 \
+	-DHAVE_WINSOCK2_H=1 \
 	-DHAVE_IOCTLSOCKET_FIONBIO=1 \
 	-DEWOULDBLOCK=WSAEWOULDBLOCK \
 	-DEADDRNOTAVAIL=WSAEADDRNOTAVAIL \
